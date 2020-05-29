@@ -45,13 +45,35 @@ class Transaction(models.Model):
         self.save()
 
     def transact(self):
-        self.published_date = timezone.now()
+        self.created_date = timezone.now()
         self.save()
 
 
 class Category(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.title
+
+
+class Plans(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    money_sum = models.DecimalField(max_digits=5, decimal_places=2)
+    date = models.DateTimeField(default=timezone.now)
+    category = models.ForeignKey('Category', null=True, default=None,
+                                 blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+
+class Goals(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    money_sum = models.DecimalField(max_digits=5, decimal_places=2)
+    end_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.title
