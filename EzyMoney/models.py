@@ -52,6 +52,7 @@ class Transaction(models.Model):
 class Category(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    required_payment = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -70,10 +71,20 @@ class Plans(models.Model):
 
 
 class Goals(models.Model):
+
+    STATUS_STARTED = 'Started'
+    STATUS_FINISHED = 'Finished'
+
+    STATUS_CHOICES = (
+        (STATUS_STARTED, 'Выполнение'),
+        (STATUS_FINISHED, 'Завершена'))
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     money_sum = models.DecimalField(max_digits=5, decimal_places=2)
     end_date = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES,
+                              default=STATUS_STARTED, blank=True)
 
     def __str__(self):
         return self.title
