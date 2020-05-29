@@ -1,6 +1,15 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.db.models import Avg
+
+
+class TransactionQuerySet(models.QuerySet):
+    def all_transaction(self, **kwargs):
+        return self.filter(user=kwargs['user'])
+
+    def transaction_during_period(self, **kwargs):
+        return self.filter(user=kwargs['user'], date_time__range=(kwargs['start_day'], ['end_day']))
 
 
 class Transaction(models.Model):
@@ -25,7 +34,8 @@ class Transaction(models.Model):
     @classmethod
     def balance_adjustment(cls, self, **kwargs):
         global adjustment
-        money_sum = cls.objects.filter(user=kwargs['user'], account=kwargs['account']).aggregate('money_sum')
+        money_sum = cls.objects.filter(user=kwargs['user'], account=kwargs['account']).aggregate(Avg('money_sum'))
+
         if money_sum < kwargs['money_sum'] and kwargs['money_sum'] > 0:
             adjustment = kwargs['money_sum'] - money_sum
         elif money_sum > kwargs['money_sum'] > 0:
